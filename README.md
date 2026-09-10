@@ -138,3 +138,22 @@ Before submitting a pull request:
     cargo test
 
 Make sure all tests pass.
+
+## Status: Experimental
+
+This is an experimental project. It compiles and runs, but it is not ready for daily use.
+
+| Aspect | Rating |
+|--------|--------|
+| Idea | 9/10 |
+| Code quality | 5/10 |
+| Feature completeness | 4/10 |
+| Production readiness | 2/10 |
+
+**What works:** FUSE mount, Louvain clustering, file reading.
+
+**What is missing:** dedup, compression, daemon, content-based clustering.
+
+**What is broken:** some files show as Unknown, no integration tests, no benchmarks.
+
+This project is a starting point, not a finished tool. Contributions are welcome.
