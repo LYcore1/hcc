@@ -28,6 +28,8 @@ pub enum FileType {
     Binary,
     Config,
     Text,
+    Data,
+    Archive,
     GitMetadata,
     Unknown,
 }
@@ -57,6 +59,8 @@ impl std::fmt::Display for FileType {
             FileType::Binary => write!(f, "Binary"),
             FileType::Config => write!(f, "Config"),
             FileType::Text => write!(f, "Text"),
+            FileType::Data => write!(f, "Data"),
+            FileType::Archive => write!(f, "Archive"),
             FileType::GitMetadata => write!(f, "GitMetadata"),
             FileType::Unknown => write!(f, "Unknown"),
         }
@@ -200,6 +204,7 @@ fn check_extension(ext: &str) -> Option<FileType> {
         "html" | "htm" => Some(FileType::HTML),
         "css" | "scss" | "sass" => Some(FileType::CSS),
         "json" => Some(FileType::JSON),
+        "gitignore" | "gitattributes" | "dockerignore" => Some(FileType::Config),
         "yaml" | "yml" => Some(FileType::YAML),
         "xml" => Some(FileType::Xml),
         "sh" | "bash" | "zsh" | "fish" | "awk" | "sed" => Some(FileType::Shell),
@@ -221,6 +226,14 @@ fn check_filename(name: &str) -> Option<FileType> {
         "README" | "CHANGELOG" | "CONTRIBUTING" | "AUTHORS" => Some(FileType::Markdown),
         "CMakeLists.txt" => Some(FileType::Config),
         "_fd" | "_fdfind" | "_fd.zsh" | "_fdfind.zsh" => Some(FileType::Shell),
+        "Gemfile" | "Rakefile" => Some(FileType::Ruby),
+        "go.mod" | "go.sum" => Some(FileType::Config),
+        "requirements.txt" | "setup.py" | "pyproject.toml" => Some(FileType::Config),
+        "CMakeCache.txt" => Some(FileType::Config),
+        "Vagrantfile" => Some(FileType::Ruby),
+        "UNLICENSE" | "UNLICENCE" | "NOTICE" => Some(FileType::Text),
+        "SETUP" | "INSTALL" => Some(FileType::Text),
+        "benchsuite" | "copy-examples" | "configure" | "bootstrap" => Some(FileType::Shell),
         _ => None,
     }
 }
