@@ -110,3 +110,31 @@ MIT
 
 - Inspired by the Golgi apparatus in cell biology
 - Uses graphrs, fuser, BLAKE3, walkdir
+
+## Known Issues
+
+Some files are classified as `Unknown` because their extension or filename is not in the detection list. This is expected for unusual file types.
+
+If you can improve the detection, please open a pull request. The relevant code is in `src/fingerprint.rs`:
+
+- `check_extension()` - maps file extensions to types
+- `check_filename()` - maps known filenames (Makefile, Dockerfile, ...) to types
+
+Adding a new extension or filename is a one-line change. Contributions are welcome.
+
+## Contributing
+
+Contributions are welcome. Here are ways to help:
+
+- **Add file types** to `src/fingerprint.rs`
+- **Improve clustering** in `src/graph.rs` and `src/graph/louvain.rs`
+- **Write integration tests** in `tests/`
+- **Report bugs** via GitHub Issues
+- **Improve documentation**
+
+Before submitting a pull request:
+
+    cargo build --release
+    cargo test
+
+Make sure all tests pass.
