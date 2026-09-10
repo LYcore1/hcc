@@ -1,0 +1,47 @@
+[package]
+name = "hcc"
+version = "0.1.0"
+edition = "2021"
+description = "High Capacity Colorful (HCC) Semantic File System"
+authors = ["LYcore1 <qwertyfriemdz@gmail.com>"]
+
+[features]
+default = ["fuse"]
+fuse = ["fuser", "libc"]
+
+[dependencies]
+fuser = { version = "0.15", optional = true }
+libc = { version = "0.2", optional = true }
+blake3 = "1.5"
+zstd = "0.13"
+lz4 = "1.24"
+graphrs = "0.11"
+walkdir = "2.5"
+xattr = "1.6"
+clap = { version = "4.5", features = ["derive"] }
+tokio = { version = "1.35", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
+serde_json = "1.0"
+tempfile = "3.8"
+parking_lot = "0.12"
+notify = "6.1"
+log = "0.4"
+env_logger = "0.11"
+chrono = "0.4"
+uuid = { version = "1.6", features = ["v4"] }
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bin]]
+name = "hcc"
+path = "src/main.rs"
+
+[[bin]]
+name = "hcc-daemon"
+path = "src/daemon.rs"
+
+[lib]
+name = "hcc_core"
+path = "src/lib.rs"
