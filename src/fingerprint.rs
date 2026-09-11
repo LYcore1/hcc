@@ -211,6 +211,45 @@ fn check_extension(ext: &str) -> Option<FileType> {
         "md" | "markdown" => Some(FileType::Markdown),
         "png" | "jpg" | "jpeg" | "gif" | "bmp" | "svg" | "webp" | "ico" => Some(FileType::Image),
         "exe" | "dll" | "so" | "bin" | "o" | "a" => Some(FileType::Binary),
+        // Programming languages (all map to C-like for now)
+        "swift" | "scala" | "sml" | "tcl" | "tf" | "sol" | "typ" | "r" | "re" | "pp" | "pl" | "pm"
+        | "pas" | "odin" | "nim" | "nims" | "lua" | "lisp" | "el" | "ml" | "mli" | "mm"
+        | "m" | "matlab" | "rkt" | "purs" | "rego" | "proto" | "qml" | "v" | "sv" | "svh"
+        | "vhd" | "vhdl" | "zig" | "dart" | "cbl" | "cob" | "hs" | "lhs" => Some(FileType::C),
+        // Web
+        "svelte" | "sls" | "slnx" | "vue" => Some(FileType::JavaScript),
+        // Docs and text
+        "rst" | "tex" | "textile" | "org" | "mediawiki" | "ndjson" | "list" | "less"
+        | "sum" | "tab" | "targets" | "strace" | "syslog" | "meminfo" => Some(FileType::Text),
+        // Config and data
+        "gitkeep" | "gitattributes" | "gitconfig" | "props" | "namelist" | "ninja"
+        | "nsi" | "nse" | "mod" | "orig~" | "old" | "rpmsave" | "rpmorig" | "rpmnew"
+        | "ucf-new" | "ucf-dist" | "ucf-old" | "sublime-syntax" | "tmTheme" => Some(FileType::Config),
+        // Stylesheets
+        "styl" | "slim" => Some(FileType::CSS),
+        // Backup
+        "rs~" => Some(FileType::Rust),
+        "orig" | "bak" | "old~" => Some(FileType::Text),
+        // Misc
+        "ls" | "ll" => Some(FileType::Text),
+        "robot" => Some(FileType::Text),
+        // Programming languages
+        "swift" | "scala" | "sml" | "tcl" | "tf" | "sol" | "typ" => Some(FileType::C),
+        "svelte" | "sls" | "slnx" => Some(FileType::JavaScript),
+        "rst" | "tex" | "textile" => Some(FileType::Markdown),
+        "sv" | "svh" => Some(FileType::C),  // SystemVerilog
+        // Config and data
+        "gitkeep" | "gitattributes" | "gitconfig" => Some(FileType::Config),
+        "syslog" | "sum" | "tab" | "targets" | "strace" => Some(FileType::Text),
+        "ucf-new" | "ucf-dist" | "ucf-old" => Some(FileType::Config),
+        "rpmsave" | "rpmorig" | "rpmnew" => Some(FileType::Config),
+        // Stylesheets
+        "styl" | "slim" => Some(FileType::CSS),
+        // Backup files
+        "rs~" => Some(FileType::Rust),
+        // Misc
+        "tmTheme" => Some(FileType::Config),
+        "sublime-syntax" => Some(FileType::Config),
         // Syntax highlighting and editor files
         "sublime-syntax" | "tmTheme" | "tmLanguage" | "tmPreferences" => Some(FileType::Config),
         "vim" | "vimrc" | "el" => Some(FileType::Config),

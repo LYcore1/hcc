@@ -20,6 +20,7 @@ HCC presents a read-only semantic view of any directory. Instead of browsing by 
 | by-type navigation | Working |
 | by-color navigation | Working |
 | Semantic file reading | Working |
+| SQLite-based cache | Working |
 | 22 unit tests | Passing |
 | Block deduplication | In development |
 | Compression | In development |
@@ -92,6 +93,8 @@ Python, JavaScript, TypeScript, Rust, C, Cpp, Go, Java, Ruby, Php, SQL, HTML, CS
 - Read-only
 - Heuristic clustering (by directory and name, not content)
 - FUSE overhead (~20% slower than ext4)
+- About 17% of files classified as Unknown (files with rare extensions)
+- Cache rebuilds on every mount (may take a few seconds for large projects)
 
 ## Roadmap
 
