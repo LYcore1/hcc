@@ -16,6 +16,7 @@ use fuser::{
 use parking_lot::RwLock;
 
 use crate::{fingerprint, ColorTable, DedupTable};
+use crate::cache::Cache;
 
 const TTL: Duration = Duration::from_secs(1);
 
@@ -35,6 +36,8 @@ pub struct HccFs {
     pub inodes: RwLock<HashMap<u64, VirtualNode>>,
     pub vpath_to_ino: RwLock<HashMap<PathBuf, u64>>,
     pub next_ino: AtomicU64,
+    /// SQLite-based cache for file types (low RAM usage)
+    pub cache: Arc<parking_lot::Mutex<Cache>>,
 }
 
 impl HccFs {
@@ -54,13 +57,18 @@ impl HccFs {
         );
         vpath_to_ino.insert(PathBuf::from("/"), FUSE_ROOT_ID);
 
+        // Build SQLite cache path
+        let cache_db = source.join(".hcc").join("cache.db");
+        let cache = Cache::new(&cache_db).expect("Failed to create cache");
+        
         let fs = Self {
-            source,
+            source: source.clone(),
             color_table: Arc::new(RwLock::new(color_table)),
             dedup: Arc::new(dedup),
             inodes: RwLock::new(inodes),
             vpath_to_ino: RwLock::new(vpath_to_ino),
             next_ino: AtomicU64::new(FUSE_ROOT_ID + 1),
+            cache: Arc::new(parking_lot::Mutex::new(cache)),
         };
 
         fs.register_dir("/by-type", "by-type", FUSE_ROOT_ID);
@@ -262,43 +270,44 @@ impl HccFs {
         None
     }
 
+
     fn detect_types(&self) -> Vec<String> {
-        let mut set = HashSet::new();
-        for entry in walkdir::WalkDir::new(&self.source)
-            .into_iter()
-            .filter_map(|e| e.ok())
+        // Build cache on first access
         {
-            if entry.file_type().is_file() {
-                if let Ok(fp) = fingerprint(entry.path()) {
-                    set.insert(format!("{:?}", fp.file_type));
-                }
+            let mut cache = self.cache.lock();
+            if cache.count().unwrap_or(0) == 0 {
+                let _ = cache.set_source(self.source.clone());
+                let _ = cache.build_cache();
             }
         }
-        let mut v: Vec<String> = set.into_iter().collect();
-        v.sort();
-        v
+        
+        let cache = self.cache.lock();
+        cache.get_types().unwrap_or_default()
     }
 
     fn files_of_type(&self, type_name: &str) -> Vec<(String, PathBuf)> {
-        let mut out = Vec::new();
-        for entry in walkdir::WalkDir::new(&self.source)
-            .into_iter()
-            .filter_map(|e| e.ok())
+        // Build cache on first access
         {
-            if entry.file_type().is_file() {
-                if let Ok(fp) = fingerprint(entry.path()) {
-                    if format!("{:?}", fp.file_type) == type_name {
-                        let name = entry
-                            .path()
-                            .file_name()
-                            .map(|s| s.to_string_lossy().to_string())
-                            .unwrap_or_default();
-                        out.push((name, entry.path().to_path_buf()));
-                    }
-                }
+            let mut cache = self.cache.lock();
+            if cache.count().unwrap_or(0) == 0 {
+                let _ = cache.set_source(self.source.clone());
+                let _ = cache.build_cache();
             }
         }
-        out
+        
+        let cache = self.cache.lock();
+        cache.get_files_by_type(type_name)
+            .unwrap_or_default()
+            .into_iter()
+            .map(|(path, _ext)| {
+                let pb = PathBuf::from(&path);
+                let name = pb
+                    .file_name()
+                    .map(|s| s.to_string_lossy().to_string())
+                    .unwrap_or_default();
+                (name, pb)
+            })
+            .collect()
     }
 
     fn resolve_child(&self, parent_ino: u64, name: &str) -> Option<u64> {

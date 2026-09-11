@@ -211,6 +211,38 @@ fn check_extension(ext: &str) -> Option<FileType> {
         "md" | "markdown" => Some(FileType::Markdown),
         "png" | "jpg" | "jpeg" | "gif" | "bmp" | "svg" | "webp" | "ico" => Some(FileType::Image),
         "exe" | "dll" | "so" | "bin" | "o" | "a" => Some(FileType::Binary),
+        // Syntax highlighting and editor files
+        "sublime-syntax" | "tmTheme" | "tmLanguage" | "tmPreferences" => Some(FileType::Config),
+        "vim" | "vimrc" | "el" => Some(FileType::Config),
+        // Patch and diff files
+        "patch" | "diff" | "rej" | "orig" => Some(FileType::Text),
+        // Man pages
+        "man" | "in" => Some(FileType::Text),
+        // Data files
+        "csv" | "tsv" => Some(FileType::Data),
+        // Version control
+        "gitkeep" | "gitconfig" | "gitattributes" | "gitignore" | "gitmodules" => Some(FileType::Config),
+        // Shell scripts
+        "bat" | "cmd" | "ps1" | "psm1" => Some(FileType::Shell),
+        // Programming languages
+        "dart" => Some(FileType::C),  // Dart uses C-like syntax
+        "cbl" | "cob" => Some(FileType::C),  // COBOL
+        "nix" => Some(FileType::Config),  // Nix
+        "hs" | "lhs" => Some(FileType::Text),  // Haskell
+        "zig" => Some(FileType::C),  // Zig
+        "wgsl" => Some(FileType::Text),  // WebGPU Shading Language
+        "v" | "vhdl" | "vhd" => Some(FileType::Text),  // Verilog/VHDL
+        "vy" | "varlink" => Some(FileType::Text),
+        // Web
+        "vue" => Some(FileType::JavaScript),  // Vue
+        "xaml" => Some(FileType::Xml),  // XAML
+        // Misc
+        "dot" => Some(FileType::Text),  // Graphviz
+        "suffix" => Some(FileType::Text),
+        "ucf-old" => Some(FileType::Text),
+        "wrong_ext" => Some(FileType::Text),
+        "unknown~" => Some(FileType::Text),
+        "cpuinfo" => Some(FileType::Text),
         "toml" | "ini" | "conf" | "cfg" | "lock" => Some(FileType::Config),
         "txt" | "log" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" => Some(FileType::Text),
         _ => None,

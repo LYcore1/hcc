@@ -3,6 +3,7 @@
 //! This module handles all logic that does not directly access the file system.
 //! It includes color assignment, graph building, and community detection.
 
+pub mod cache;
 pub mod color;
 pub mod fingerprint;
 pub mod graph;
