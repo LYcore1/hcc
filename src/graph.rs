@@ -138,7 +138,8 @@ pub fn build_graph(root: &Path) -> Result<FileGraph, Box<dyn std::error::Error>>
     }
 
     // Create edges based on name prefix similarity
-    create_prefix_edges(&mut graph, &path_to_idx);
+    // DISABLED: O(n^2) explosion on large projects (Issue C)
+    // create_prefix_edges(&mut graph, &path_to_idx);
 
     log::info!("Created {} edges", graph.edges.len());
 
@@ -154,8 +155,11 @@ fn create_directory_edges(
     // Files in the same directory get a base weight
     let base_weight = 0.5;
 
-    for i in 0..files.len() {
-        for j in (i + 1)..files.len() {
+    // Limit to first 100 files per directory to avoid O(n^2) explosion
+    let limit = files.len().min(500);
+
+    for i in 0..limit {
+        for j in (i + 1)..limit {
             if let (Some(&idx1), Some(&idx2)) =
                 (path_to_idx.get(&files[i]), path_to_idx.get(&files[j]))
             {
@@ -167,7 +171,7 @@ fn create_directory_edges(
 
 /// Create edges between files with similar names
 fn create_prefix_edges(graph: &mut FileGraph, path_to_idx: &HashMap<PathBuf, usize>) {
-    let paths: Vec<&PathBuf> = path_to_idx.keys().collect();
+    let paths: Vec<&PathBuf> = path_to_idx.keys().take(1000).collect();
 
     for i in 0..paths.len() {
         for j in (i + 1)..paths.len() {
@@ -199,9 +203,19 @@ fn create_prefix_edges(graph: &mut FileGraph, path_to_idx: &HashMap<PathBuf, usi
     }
 }
 
-/// Detect communities using the Louvain algorithm from graphrs
+/// Detect communities using a hybrid approach:
+/// - Louvain for small projects (< 5000 files): semantic clustering
+/// - Connected Components for large projects (>= 5000 files): fast clustering
 pub fn detect_communities(graph: &FileGraph) -> Result<Vec<Vec<usize>>, Box<dyn std::error::Error>> {
-    louvain::detect_communities_louvain(graph)
+    let node_count = graph.nodes.len();
+    
+    if node_count < 5000 {
+        log::info!("Using Louvain for {} nodes (small project)", node_count);
+        louvain::detect_communities_louvain(graph)
+    } else {
+        log::info!("Using connected components for {} nodes (large project)", node_count);
+        louvain::detect_communities_fallback(graph)
+    }
 }
 
 #[cfg(test)]

@@ -64,7 +64,7 @@ pub fn detect_communities_louvain(graph: &FileGraph) -> Result<Vec<Vec<usize>>, 
     let communities_result = louvain::louvain_communities(
         &g,
         true,       // weighted = true
-        Some(1.0),  // resolution parameter
+        Some(0.5),  // resolution parameter
         None,       // default threshold
         Some(42)    // seed for reproducibility
     );
@@ -100,7 +100,7 @@ pub fn detect_communities_louvain(graph: &FileGraph) -> Result<Vec<Vec<usize>>, 
 }
 
 /// Fallback community detection using connected components
-fn detect_communities_fallback(graph: &FileGraph) -> Result<Vec<Vec<usize>>, Box<dyn std::error::Error>> {
+pub fn detect_communities_fallback(graph: &FileGraph) -> Result<Vec<Vec<usize>>, Box<dyn std::error::Error>> {
     let n = graph.nodes.len();
     
     if n == 0 {
